@@ -90,5 +90,54 @@ class Client extends BaseController
         }
     }
 
+    public function update($id) {
+        try {
+            $model = new ClientModel();
+            $model->findClientById($id);
+
+            $input = $this->getRequestInput($this->request);
+
+            $model->update($id, $input);
+            $client = $model->findClientById($id);
+
+            return $this->getResponse(
+                [
+                    'message' => 'Client updated successfully',
+                    'client' => $client
+                ]
+            );
+        }
+
+        catch (Exception $exception) {
+            return $this->getResponse(
+                [
+                    'message' => $exception->getMessage()
+                ],
+                ResponseInterface::HTTP_NOT_FOUND
+            );
+        }
+    }
+
+    public function destroy($id) {
+        try {
+                $model = new ClientModel();
+                $client = $model->findClientById($id);
+                $model->delete($client);
+                return $this->getResponse(
+                    [
+                        'message' => 'Client deleted successfully',
+                    ]
+                );
+        }
+        catch (Exception $exception) {
+            return $this->getResponse(
+                [
+                    'message' => $exception->getMessage()
+                ],
+                ResponseInterface::HTTP_NOT_FOUND
+            );
+        }
+    }
+
 
 }
