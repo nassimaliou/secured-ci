@@ -44,47 +44,42 @@ class BaseController extends Controller
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        // Do Not Edit This Line
         parent::initController($request, $response, $logger);
+    }
 
-        // Preload any models, libraries, etc, here.
+    public function getResponse(array $responseBody,int $code = ResponseInterface::HTTP_OK)
+    {
+        return $this->response->setStatusCode($code)->setJSON($responseBody);
+    }
 
-        // E.g.: $this->session = \Config\Services::session();
-
-        public function getResponse(array $responseBody, int $code = ResponseInterface::HTTP_OK)
-        {
-            return $this->response->setStatusCode($code)->setJSON($responseBody);
+    public function getRequestInput(IncomingRequest $request)
+    {
+        $input = $request->getPost();
+        if(empty($input)){
+            $input = json_decode($request->getBody(), true);
         }
+        return $input;
+    }
 
-        public function getRequestInput(IncomingRequest $request)
-        {
-            $input = $request->getPost();
-            if(empty($input)){
-                $input = json_decode($request->getBody(), true);
-            }
-            return $input;
-        }
+    public function validateRequest($input, array $rules, array $message = [])
+    {
+        $this->validator = Services::Validation()->setRules($rules);
 
-        public function validateRequest($input, array $rules, array $message = [])
-        {
-            $this->validator = Services::Validation()->setRules($rules);
+        if (is_string($rules)){
+            $validation = config('Validation');
 
-            if (is_string($rules)){
-                $validation = config('Validation');
-
-                if (!isset($validation->$rules)) {
-                    throw ValidationException::forRuleNotFound($rules);
-                }
-
-                if(!$message){
-                    $errorName = $rules.'_errors';
-                    $messages = $validation->$errorName ?? [];
-                }
-
-                $rules = $validation->$rules;
+            if (!isset($validation->$rules)) {
+                throw ValidationException::forRuleNotFound($rules);
             }
 
-            return $this->validator->setRules($rules, $messages)->run($input);
+            if(!$message){
+                $errorName = $rules.'_errors';
+                $messages = $validation->$errorName ?? [];
+            }
+
+            $rules = $validation->$rules;
         }
+
+        return $this->validator->setRules($rules, $message)->run($input);
     }
 }

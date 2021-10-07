@@ -54,15 +54,16 @@ class Auth extends BaseController
         $input = $this->getRequestInput($this->request);
 
         if (!$this->validateRequest($input, $rules, $errors)) {
-            return $this
-                ->getResponse(
-                    $this->validator->getErrors(),
-                    ResponseInterface::HTTP_BAD_REQUEST
-                );
+            return $this->getResponse($this->validator->getErrors(),ResponseInterface::HTTP_BAD_REQUEST);
         }
 
        return $this->getJWTForUser($input['email']);
     }
+
+
+
+
+
 
     private function getJWTForUser( string $emailAddress, int $responseCode = ResponseInterface::HTTP_OK )
     {
@@ -73,11 +74,11 @@ class Auth extends BaseController
 
             helper('jwt');
 
-            return $this=>getResponse(
+            return $this->getResponse(
                 [
                     'message' => 'User authenticated successfully',
                     'user' => $user,
-                    'access_token' => getSignedJWTFORUser($emailAddress);
+                    'access_token' => getSignedJWTFORUser($emailAddress)
                 ]
             );
         }

@@ -21,12 +21,12 @@ class UserModel extends Model
 
     protected function beforeInsert(array $data) : array
     {
-        return $this->getUpdatedWithHashedPassword($data);
+        return $this->getUpdatedDataWithHashedPassword($data);
     }
 
     protected function beforeUpdate(array $data) : array
     {
-        return $this->getUpdatedWithHashedPassword($data)
+        return $this->getUpdatedDataWithHashedPassword($data);
     }
 
 
